@@ -111,7 +111,8 @@ options:
     description:
       - Special time specification nickname.
     type: str
-    choices: [ annually, daily, hourly, monthly, reboot, weekly, yearly ]
+    choices: [ annually, daily, hourly, monthly, reboot, weekly, yearly, unset ]
+    default: "unset"
     version_added: "1.3"
   disabled:
     description:
@@ -570,7 +571,7 @@ def main():
             month=dict(type='str', default='*'),
             weekday=dict(type='str', default='*', aliases=['dow']),
             reboot=dict(type='bool', default=False),
-            special_time=dict(type='str', choices=["reboot", "yearly", "annually", "monthly", "weekly", "daily", "hourly"]),
+            special_time=dict(type='str', default="unset", choices=["reboot", "yearly", "annually", "monthly", "weekly", "daily", "hourly", "special_time"]),
             disabled=dict(type='bool', default=False),
             env=dict(type='bool'),
             insertafter=dict(type='str'),
@@ -646,6 +647,7 @@ def main():
         module.fail_json(msg="You must specify 'name' while working with environment variables (env=yes)")
 
     if (special_time or reboot) and \
+       (special_time != "unset") and \
        (True in [(x != '*') for x in [minute, hour, day, month, weekday]]):
         module.fail_json(msg="You must specify time and date fields or special time.")
 
